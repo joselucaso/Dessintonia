@@ -13,23 +13,24 @@
         <div class="glow-orb orb-2"></div>
     </div>
     
-    <div class="team-scores">
-        <div class="team-score purple" id="score-team-1">
-            <span class="label">Time A</span>
-            <span class="value">0</span>
+    <div class="game-wrapper">
+        <div class="team-scores">
+            <div class="team-score purple" id="score-team-1">
+                <span class="label">Time A</span>
+                <span class="value">0</span>
+            </div>
+            <div class="team-score turquoise" id="score-team-2">
+                <span class="label">Time B</span>
+                <span class="value">0</span>
+            </div>
         </div>
-        <div class="team-score turquoise" id="score-team-2">
-            <span class="label">Time B</span>
-            <span class="value">0</span>
-        </div>
-    </div>
 
-    <main class="game-container glass-panel">
-        <section class="card-section">
-            <div class="concept left-concept" id="left-concept">...</div>
-            <div class="vs-badge">VS</div>
-            <div class="concept right-concept" id="right-concept">...</div>
-        </section>
+        <main class="game-container glass-panel">
+            <section class="card-section">
+                <div class="concept left-concept" id="left-concept">...</div>
+                <div class="vs-badge">VS</div>
+                <div class="concept right-concept" id="right-concept">...</div>
+            </section>
 
         <section class="dial-section">
             <button class="btn-refresh" id="btn-next" title="Nova Rodada">
@@ -106,12 +107,20 @@
             <div class="opponent-controls" id="opponent-controls">
                 <p class="control-label">O Alvo está para qual lado do ponteiro?</p>
                 <div class="btn-group">
-                    <button class="btn btn-small" id="btn-guess-left">← Esquerda</button>
-                    <button class="btn btn-small" id="btn-guess-right">Direita →</button>
+                    <button class="btn btn-small" id="btn-guess-left">
+                        <span class="arrow">←</span>
+                        <span class="text">Esquerda</span>
+                    </button>
+                    <button class="btn btn-small" id="btn-guess-right">
+                        <span class="arrow">→</span>
+                        <span class="text">Direita</span>
+                    </button>
                 </div>
             </div>
         </section>
     </main>
+
+    </div>
 
     <script src="js/app.js"></script>
 </body>
