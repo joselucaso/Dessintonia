@@ -133,7 +133,7 @@ h1 {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    padding: 0 50px;
+    padding: 0 clamp(10px, 5vw, 50px);
     pointer-events: none;
     z-index: 100;
 }
@@ -145,12 +145,12 @@ h1 {
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: 8px 40px;
-    min-width: 150px;
+    padding: clamp(4px, 1vh, 8px) clamp(10px, 3vw, 40px);
+    min-width: clamp(100px, 25vw, 150px);
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(10px);
     border-radius: 10px;
-    gap: 15px;
+    gap: clamp(5px, 2vw, 15px);
     pointer-events: auto;
     transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
     opacity: 0.65;
@@ -231,7 +231,7 @@ h1 {
 
 /* Shared typography */
 .team-score .label {
-    font-size: 0.7rem;
+    font-size: clamp(0.5rem, 1.5vw, 0.7rem);
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: 900;
@@ -239,7 +239,7 @@ h1 {
 }
 
 .team-score .value {
-    font-size: 1.5rem;
+    font-size: clamp(1rem, 4vw, 1.5rem);
     font-weight: 900;
     line-height: 1;
 }
@@ -264,13 +264,15 @@ h1 {
 }
 
 .concept {
-    font-size: 1.5rem;
+    font-size: clamp(0.9rem, 4vw, 1.5rem);
     font-weight: 700;
     text-transform: uppercase;
     flex: 1;
     text-align: center;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
     transition: all 0.3s ease;
+    word-break: break-word;
+    line-height: 1.1;
 }
 
 .left-concept {
@@ -458,67 +460,6 @@ h1 {
 .flash-overlay.active {
     opacity: 0.2;
     transition: none;
-}
-
-/* 2. Screen Shake */
-@keyframes screen-shake-intense {
-    0% {
-        transform: translate(1px, 1px) rotate(0deg);
-    }
-
-    20% {
-        transform: translate(-1px, 0px) rotate(0.5deg);
-    }
-
-    40% {
-        transform: translate(1px, -1px) rotate(-0.5deg);
-    }
-
-    60% {
-        transform: translate(-1px, 1px) rotate(0deg);
-    }
-
-    80% {
-        transform: translate(1px, 0px) rotate(0.5deg);
-    }
-
-    100% {
-        transform: translate(0, 0) rotate(0deg);
-    }
-}
-
-@keyframes screen-shake-extreme {
-    0% {
-        transform: translate(2px, 2px) rotate(0deg);
-    }
-
-    20% {
-        transform: translate(-2px, -3px) rotate(-1deg);
-    }
-
-    40% {
-        transform: translate(3px, 2px) rotate(1deg);
-    }
-
-    60% {
-        transform: translate(-3px, -2px) rotate(-1deg);
-    }
-
-    80% {
-        transform: translate(2px, -1px) rotate(1deg);
-    }
-
-    100% {
-        transform: translate(0, 0) rotate(0deg);
-    }
-}
-
-body.shake-intense {
-    animation: screen-shake-intense 0.4s cubic-bezier(.36, .07, .19, .97) both;
-}
-
-body.shake-extreme {
-    animation: screen-shake-extreme 0.6s cubic-bezier(.36, .07, .19, .97) both;
 }
 
 /* 3. Score Mega Pop */
@@ -753,7 +694,7 @@ body.shake-extreme {
     }
 
     .concept {
-        font-size: 1.1rem;
+        font-size: clamp(0.85rem, 3.5vw, 1.1rem);
     }
 
     .vs-badge {
@@ -1004,24 +945,6 @@ body.shake-extreme {
 }
 
 /* --- SCORE DAMAGE EFFECTS --- */
-@keyframes score-shake {
-    0% { transform: translate(0, 0) rotate(0deg); }
-    10% { transform: translate(-1px, -0.5px) rotate(-0.2deg); }
-    20% { transform: translate(-0.5px, 1px) rotate(0.2deg); }
-    30% { transform: translate(1px, 0.5px) rotate(0deg); }
-    40% { transform: translate(0.5px, -0.5px) rotate(0.2deg); }
-    50% { transform: translate(-0.5px, 0.5px) rotate(-0.2deg); }
-    60% { transform: translate(-1px, 0.5px) rotate(0deg); }
-    70% { transform: translate(1px, 0.5px) rotate(-0.2deg); }
-    80% { transform: translate(-0.5px, -0.5px) rotate(0.2deg); }
-    90% { transform: translate(0.5px, 1px) rotate(0deg); }
-    100% { transform: translate(0, 0) rotate(0deg); }
-}
-
-.score-damage-shake {
-    animation: score-shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-}
-
 .floating-point-loss {
     position: absolute;
     top: -20px;
@@ -1043,12 +966,12 @@ body.shake-extreme {
 
 /* --- ELECTRIC SHOCK / GLITCH EFFECTS --- */
 @keyframes glitch-effect {
-    0% { transform: translate(0); filter: hue-rotate(0deg) contrast(1); }
-    20% { transform: translate(-3px, 3px) skew(5deg); filter: hue-rotate(90deg) contrast(2); }
-    40% { transform: translate(3px, -3px) skew(-5deg); }
-    60% { transform: translate(-3px, -3px); filter: brightness(2); }
-    80% { transform: translate(3px, 3px); }
-    100% { transform: translate(0); filter: hue-rotate(0deg) contrast(1); }
+    0% { filter: hue-rotate(0deg) contrast(1); }
+    20% { filter: hue-rotate(90deg) contrast(2); }
+    40% { filter: hue-rotate(0deg) contrast(1); }
+    60% { filter: brightness(2); }
+    80% { filter: brightness(1.5); }
+    100% { filter: hue-rotate(0deg) contrast(1); }
 }
 
 .score-overload {
@@ -1374,6 +1297,7 @@ body.shake-extreme {
     flex: 1;
     text-align: center;
     word-break: break-word;
+    font-size: clamp(0.8rem, 3vw, 1.1rem);
 }
 
 .vs-badge.small {

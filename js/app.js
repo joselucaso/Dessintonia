@@ -37,8 +37,86 @@ const CONFIG = {
     FALLBACK_CARDS: [
         { "left": "Quente", "right": "Frio" },
         { "left": "Inútil", "right": "Útil" },
+        { "left": "Chato", "right": "Divertido" },
+        { "left": "Lixo", "right": "Arte" },
+        { "left": "Cheira mal", "right": "Cheira bem" },
+        { "left": "Seco", "right": "Molhado" },
         { "left": "Leve", "right": "Pesado" },
-        { "left": "Fácil", "right": "Difícil" }
+        { "left": "Fácil", "right": "Difícil" },
+        { "left": "Subestimado", "right": "Superestimado" },
+        { "left": "Gosto Ruim", "right": "Gosto Bom" },
+        { "left": "Triste", "right": "Feliz" },
+        { "left": "Cansativo", "right": "Relaxante" },
+        { "left": "Feio", "right": "Bonito" },
+        { "left": "Pobre", "right": "Rico" },
+        { "left": "Desconhecido", "right": "Famoso" },
+        { "left": "Barato", "right": "Caro" },
+        { "left": "Lento", "right": "Rápido" },
+        { "left": "Curto", "right": "Longo" },
+        { "left": "Suave", "right": "Áspero" },
+        { "left": "Silencioso", "right": "Barulhento" },
+        { "left": "Filme Ruim", "right": "Filme Bom" },
+        { "left": "Comida Saudável", "right": "Junk Food" },
+        { "left": "Seguro", "right": "Perigoso" },
+        { "left": "Infantil", "right": "Adulto" },
+        { "left": "Ciência", "right": "Magia" },
+        { "left": "Fraco", "right": "Forte" },
+        { "left": "Velho", "right": "Novo" },
+        { "left": "Comum", "right": "Raro" },
+        { "left": "Natural", "right": "Artificial" },
+        { "left": "Simples", "right": "Complexo" },
+        { "left": "Sem graça", "right": "Engraçado" },
+        { "left": "Fora de moda", "right": "Na moda" },
+        { "left": "Amargo", "right": "Doce" },
+        { "left": "Sombrio", "right": "Iluminado" },
+        { "left": "Grosseiro", "right": "Educado" },
+        { "left": "Fraco de espírito", "right": "Corajoso" },
+        { "left": "Introvertido", "right": "Extrovertido" },
+        { "left": "Pessimista", "right": "Otimista" },
+        { "left": "Formal", "right": "Informal" },
+        { "left": "Analógico", "right": "Digital" },
+        { "left": "Primitivo", "right": "Avançado" },
+        { "left": "Egoísta", "right": "Generoso" },
+        { "left": "Superficial", "right": "Profundo" },
+        { "left": "Previsível", "right": "Surpreendente" },
+        { "left": "Passado", "right": "Futuro" },
+        { "left": "Terra", "right": "Espaço" },
+        { "left": "Cidade grande", "right": "Interior" },
+        { "left": "Trabalho chato", "right": "Trabalho dos sonhos" },
+        { "left": "Terrestre", "right": "Aquático" },
+        { "left": "Dia", "right": "Noite" },
+        { "left": "Inverno", "right": "Verão" },
+        { "left": "Racional", "right": "Emocional" },
+        { "left": "Controlado", "right": "Caótico" },
+        { "left": "Esquecível", "right": "Inesquecível" },
+        { "left": "Overrated", "right": "Underrated" },
+        { "left": "Bagunçado", "right": "Organizado" },
+        { "left": "Covarde", "right": "Herói" },
+        { "left": "Vilão", "right": "Mocinho" },
+        { "left": "Clássico", "right": "Moderno" },
+        { "left": "Ruído", "right": "Música" },
+        { "left": "Trabalho braçal", "right": "Trabalho intelectual" },
+        { "left": "Improviso", "right": "Planejamento" },
+        { "left": "Sonho", "right": "Realidade" },
+        { "left": "Ficção", "right": "Documentário" },
+        { "left": "Medo", "right": "Confiança" },
+        { "left": "Regras rígidas", "right": "Liberdade total" },
+        { "left": "Caro demais", "right": "Não tem preço" },
+        { "left": "Preguiçoso", "right": "Workaholic" },
+        { "left": "Antiquado", "right": "Inovador" },
+        { "left": "Perto", "right": "Longe" },
+        { "left": "Pequeno", "right": "Gigante" },
+        { "left": "Acidente", "right": "Destino" },
+        { "left": "Amador", "right": "Profissional" },
+        { "left": "Ingênuo", "right": "Esperto" },
+        { "left": "Fã raiz", "right": "Fã casual" },
+        { "left": "Azar", "right": "Sorte" },
+        { "left": "Comédia", "right": "Drama" },
+        { "left": "Privado", "right": "Público" },
+        { "left": "Frio demais", "right": "Apaixonado" },
+        { "left": "Esquecido", "right": "Lendário" },
+        { "left": "Bolsonaro", "right": "Lula" },
+        { "left": "Stark", "right": "Targaryen" }
     ]
 };
 
@@ -60,7 +138,7 @@ class DessintoniaGame {
         this.teamPower = { 1: 0, 2: 0 };
         this.currentTeam = 1;
         this.isPeeking = false;
-        this.lastCardIndex = -1; // para evitar repetição de carta
+        this.lastCardId = null; // para evitar repetição de carta
         this.sounds = {
             fail: new Audio('audio/faaah.mp3'),
             success: new Audio('audio/levelup.mp3'),
@@ -88,11 +166,20 @@ class DessintoniaGame {
     }
 
     async loadCards() {
+        // Agora usamos a lista interna por padrão para evitar problemas de CORS/file://
+        this.cards = CONFIG.FALLBACK_CARDS;
+        
         try {
             const response = await fetch('data/cards.json');
-            this.cards = response.ok ? await response.json() : CONFIG.FALLBACK_CARDS;
+            if (response.ok) {
+                const remoteCards = await response.json();
+                if (remoteCards && remoteCards.length > 0) {
+                    this.cards = remoteCards;
+                    log(`[CARDS] ${this.cards.length} cartas carregadas via fetch.`);
+                }
+            }
         } catch (e) {
-            this.cards = CONFIG.FALLBACK_CARDS;
+            warn("[CARDS] Erro ao carregar cards.json (comum em file://). Usando lista interna.");
         }
         this.shuffleDeck(); // embaralha após carregar
     }
@@ -114,8 +201,26 @@ class DessintoniaGame {
             this.shuffleDeck();
             log('[DECK] Baralho esgotado — novo embaralhamento.');
         }
-        const idx = this.cardDeck[this.deckIndex++];
-        return this.cards[idx];
+
+        let idx = this.cardDeck[this.deckIndex++];
+        let card = this.cards[idx];
+
+        // Se a configuração de não repetir estiver ativa e a carta for igual à última
+        if (CONFIG.CARD_NO_REPEAT && this.lastCardId === (card.left + card.right)) {
+            // Tenta pegar a próxima se houver
+            if (this.deckIndex < this.cardDeck.length) {
+                idx = this.cardDeck[this.deckIndex++];
+                card = this.cards[idx];
+            } else {
+                // Se era a última, reembaralha
+                this.shuffleDeck();
+                idx = this.cardDeck[this.deckIndex++];
+                card = this.cards[idx];
+            }
+        }
+
+        this.lastCardId = card.left + card.right;
+        return card;
     }
 
     setupDOMReferences() {
