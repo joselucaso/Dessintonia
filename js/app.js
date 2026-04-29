@@ -270,7 +270,8 @@ class DessintoniaGame {
             opt1Left: document.getElementById('opt-1-left'),
             opt1Right: document.getElementById('opt-1-right'),
             opt2Left: document.getElementById('opt-2-left'),
-            opt2Right: document.getElementById('opt-2-right')
+            opt2Right: document.getElementById('opt-2-right'),
+            btnCloseCardModal: document.getElementById('btn-close-card-modal')
         };
     }
 
@@ -348,6 +349,10 @@ class DessintoniaGame {
         this.dom.btnAltCard.addEventListener('click', () => this.showAlternativeCardModal());
         this.dom.cardOpt1.addEventListener('click', () => this.selectCard(1));
         this.dom.cardOpt2.addEventListener('click', () => this.selectCard(2));
+        this.dom.btnCloseCardModal.addEventListener('click', () => {
+            this.dom.cardChoiceModal.style.display = 'none';
+            this.dom.btnAltCard.style.display = 'block'; // Mostra o botão de volta se cancelou
+        });
     }
 
     // Helper: retorna dados do time pelo id
@@ -361,6 +366,7 @@ class DessintoniaGame {
         this.hasUsedPowerThisRound = { 1: false, 2: false };
         this.hasGuessedThisRound = { 1: false, 2: false };
         this.hasDrawnAlternativeCard = false;
+        this.alternativeCard = null;
 
         // Alternar time sempre (se não revelou o alvo, perde a vez)
         this.currentTeam = this.currentTeam === 1 ? 2 : 1;
@@ -484,15 +490,17 @@ class DessintoniaGame {
     }
 
     showAlternativeCardModal() {
-        if (this.hasDrawnAlternativeCard || this.state !== 'guessing') return;
+        if (this.state !== 'guessing') return;
         
-        this.hasDrawnAlternativeCard = true;
-        this.dom.btnAltCard.style.display = 'none'; // Some o botão
+        // Só sorteia se ainda não tiver sorteado a alternativa nesta rodada
+        if (!this.alternativeCard) {
+            this.alternativeCard = this.drawCard();
+            this.hasDrawnAlternativeCard = true;
+        }
+        
+        this.dom.btnAltCard.style.display = 'none'; // Some o botão enquanto o modal está aberto
 
-        // Sorteia a segunda carta
-        this.alternativeCard = this.drawCard();
-
-        // Preenche o modal
+        // Preenche o modal com as opções
         this.dom.opt1Left.textContent = this.currentCard.left;
         this.dom.opt1Right.textContent = this.currentCard.right;
         
@@ -513,7 +521,9 @@ class DessintoniaGame {
 
         // Esconde o modal
         this.dom.cardChoiceModal.style.display = 'none';
-        this.alternativeCard = null;
+        // NÃO limpamos a alternativeCard aqui para manter a lógica de uma por rodada
+        // mas marcamos como usada para sumir com o botão de vez
+        this.dom.btnAltCard.style.display = 'none';
     }
 
     updateTeamUI() {
