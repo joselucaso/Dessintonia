@@ -1,127 +1,198 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sintonia Web</title>
-    <link rel="stylesheet" href="css/style.css?v=3">
+    <title>Dessintonia</title>
+    <link rel="stylesheet" href="css/style.css?v=104">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d0f14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="assets/icon.svg">
 </head>
+
 <body>
     <div class="background-effects">
         <div class="glow-orb orb-1"></div>
         <div class="glow-orb orb-2"></div>
     </div>
-    
+
     <div class="game-wrapper">
         <div class="team-scores">
             <div class="team-score purple" id="score-team-1">
-                <span class="label">Time A</span>
+                <span class="label">Time Violeta</span>
                 <span class="value">0</span>
+                <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-1"></div></div>
             </div>
             <div class="team-score turquoise" id="score-team-2">
-                <span class="label">Time B</span>
                 <span class="value">0</span>
+                <span class="label">Time Ciano</span>
+                <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-2"></div></div>
             </div>
         </div>
 
         <main class="game-container glass-panel">
+            <!-- Barras de Especial Estilo Fighting Game -->
+            <div class="power-container left" id="power-zone-1">
+                <div class="special-bar left" id="special-bar-1">
+                    <div class="special-segment" data-index="0"></div>
+                    <div class="special-segment" data-index="1"></div>
+                    <div class="special-segment" data-index="2"></div>
+                </div>
+            </div>
+            
+            <div class="power-container right" id="power-zone-2">
+                <div class="special-bar right" id="special-bar-2">
+                    <div class="special-segment" data-index="0"></div>
+                    <div class="special-segment" data-index="1"></div>
+                    <div class="special-segment" data-index="2"></div>
+                </div>
+            </div>
+
             <section class="card-section">
                 <div class="concept left-concept" id="left-concept">...</div>
                 <div class="vs-badge">VS</div>
                 <div class="concept right-concept" id="right-concept">...</div>
+                <button class="btn-alt-card-mini" id="btn-alt-card" style="display: none;" title="Sortear Carta Alternativa">
+                    🎴
+                </button>
             </section>
 
-        <section class="dial-section">
-            <button class="btn-refresh" id="btn-next" title="Nova Rodada">
-                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="23 4 23 10 17 10"></polyline>
-                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-                </svg>
-            </button>
-            <div class="dial-wrapper">
-                <svg viewBox="0 0 400 220" class="dial-svg" id="dial-svg">
-                    <defs>
-                        <!-- Glow filter for the marker -->
-                        <filter id="glow">
-                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                            <feMerge>
-                                <feMergeNode in="coloredBlur"/>
-                                <feMergeNode in="SourceGraphic"/>
-                            </feMerge>
-                        </filter>
-                        <!-- Gradient for the screen -->
-                        <linearGradient id="screen-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stop-color="#1e1e28"/>
-                            <stop offset="50%" stop-color="#2a2a35"/>
-                            <stop offset="100%" stop-color="#1e1e28"/>
-                        </linearGradient>
-                    </defs>
-                    
-                    <!-- Background Arc (The full spectrum) -->
-                    <path class="dial-bg" d="M 60 180 A 140 140 0 0 1 340 180" fill="none" stroke-width="40" stroke-linecap="butt" />
-                    
+            <section class="dial-section">
+                <button class="btn-refresh" id="btn-next" title="Rodar Roleta">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="3" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                    </svg>
+                </button>
+                <div class="dial-wrapper">
+                    <svg viewBox="0 0 400 220" class="dial-svg" id="dial-svg">
+                        <defs>
+                            <!-- Glow filter for the marker -->
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                            <!-- Gradient for the screen -->
+                            <linearGradient id="screen-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#1e1e28" />
+                                <stop offset="50%" stop-color="#2a2a35" />
+                                <stop offset="100%" stop-color="#1e1e28" />
+                            </linearGradient>
+                        </defs>
 
-                    
-                    <!-- Target Area Slices (Generated by JS) -->
-                    <g id="target-group"></g>
-                    
-                    <!-- Ruler Scale Markings -->
-                    <g id="scale-group"></g>
-                    
-                    <!-- The Screen (Anteparo) -->
-                    <path id="screen-path" class="screen-door" d="M 60 180 A 140 140 0 0 1 340 180" fill="none" stroke="url(#screen-grad)" stroke-width="44" stroke-linecap="butt" />
-                    
-                    <!-- Marker Needle (The main Guess) -->
-                    <g id="marker-group" class="draggable">
-                        <!-- Red main pointer -->
-                        <line class="marker-line-main" x1="200" y1="180" x2="200" y2="30" stroke-linecap="round"/>
-                        <circle class="marker-pivot" cx="200" cy="180" r="12" />
-                        <circle cx="200" cy="30" r="15" fill="transparent" class="marker-handle"/>
-                    </g>
+                        <!-- Background Arc (The full spectrum) -->
+                        <path class="dial-bg" d="M 60 180 A 140 140 0 0 1 340 180" fill="none" stroke-width="40"
+                            stroke-linecap="butt" />
 
-                    <!-- Opponent Guess Pointer (Left/Right) -->
-                    <g id="opponent-guess-group" style="display: none;">
-                        <path id="opponent-arrow" d="M 200 60 L 185 80 L 215 80 Z" fill="var(--color-orange)" filter="url(#glow)" />
-                    </g>
 
-                    <!-- Center Arrow Marker (Above everything) -->
-                    <path d="M 194 15 L 206 15 L 200 25 Z" fill="#ff3b3b" style="pointer-events: none;" />
-                </svg>
-            </div>
-            
-            <div class="score-display" id="score-display">
-                <span class="score-value">0</span> PONTOS
-            </div>
-            <p class="feedback-text" id="feedback-text"></p>
-        </section>
 
-        <section class="controls">
-            <div class="main-controls">
-                <div class="primary-btns">
-                    <button class="btn btn-secondary" id="btn-peek">Espiar</button>
-                    <button class="btn btn-primary" id="btn-reveal">Revelar</button>
+                        <!-- Target Area Slices (Generated by JS) -->
+                        <g id="target-group"></g>
+
+                        <!-- Ruler Scale Markings -->
+                        <g id="scale-group"></g>
+
+                        <!-- The Screen (Anteparo) -->
+                        <path id="screen-path" class="screen-door" d="M 60 180 A 140 140 0 0 1 340 180" fill="none"
+                            stroke="url(#screen-grad)" stroke-width="44" stroke-linecap="butt" />
+
+                        <!-- Marker Needle (The main Guess) -->
+                        <g id="marker-group" class="draggable">
+                            <!-- Red main pointer -->
+                            <line class="marker-line-main" x1="200" y1="180" x2="200" y2="30" stroke-linecap="round" />
+                            <circle class="marker-pivot" cx="200" cy="180" r="12" />
+                            <circle cx="200" cy="30" r="15" fill="transparent" class="marker-handle" />
+                        </g>
+
+                        <!-- Opponent Guess Pointer (Left/Right) -->
+                        <g id="opponent-guess-group" style="display: none;">
+                            <path id="opponent-arrow" d="M 200 60 L 185 80 L 215 80 Z" fill="#ffffff" filter="url(#glow)" />
+                        </g>
+
+                        <!-- Center Arrow Marker (Above everything) -->
+                        <path d="M 194 15 L 206 15 L 200 25 Z" fill="#ff3b3b" style="pointer-events: none;" />
+                    </svg>
+                </div>
+
+                <div class="score-display" id="score-display" style="display: none;">
+                    <div id="graphical-score" class="graphical-score"></div>
+                    <div class="score-text"><span class="score-value">0</span> PONTOS</div>
+                </div>
+                <p class="feedback-text" id="feedback-text"></p>
+            </section>
+
+            <section class="controls">
+                <div class="main-controls">
+                    <div class="primary-btns">
+                        <button class="btn btn-secondary" id="btn-peek">Espiar</button>
+                        
+                        <!-- BOTÃO POWER CENTRALIZADO -->
+                        <div class="power-trigger-wrapper visible" id="power-central-wrapper">
+                            <button class="btn-power-trigger" id="btn-power-trigger">⚡</button>
+                            <div class="power-levels-menu" id="menu-power-central">
+                                <button class="opt-power" data-level="1">⚡</button>
+                                <button class="opt-power" data-level="2">⚡⚡</button>
+                                <button class="opt-power" data-level="3">⚡⚡⚡</button>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" id="btn-reveal">Revelar</button>
+                    </div>
+                </div>
+
+                <div class="opponent-controls" id="opponent-controls">
+                    <p class="control-label">O Alvo está para qual lado do ponteiro?</p>
+                    <div class="btn-group">
+                        <button class="btn btn-small" id="btn-guess-left">
+                            <span class="arrow">←</span>
+                        </button>
+                        <button class="btn btn-small" id="btn-guess-right">
+                            <span class="arrow">→</span>
+                        </button>
+                    </div>
+                </div>
+
+                </div>
+            </section>
+        </main>
+
+        <div class="flash-overlay" id="flash-overlay"></div>
+        <div id="super-announcement" class="super-announcement">
+            <div id="super-text" class="super-text"></div>
+        </div>
+        <div id="lightning-strike" class="lightning-strike"></div>
+
+        <!-- MODAL DE ESCOLHA DE CARTA -->
+        <div class="modal-overlay" id="card-choice-modal" style="display: none;">
+            <div class="modal-content glass-panel">
+                <h2 class="modal-title">Escolha a carta da rodada</h2>
+                <div class="card-options">
+                    <button class="card-option" id="card-opt-1">
+                        <span class="concept" id="opt-1-left">Esquerda 1</span>
+                        <span class="vs-badge small">VS</span>
+                        <span class="concept" id="opt-1-right">Direita 1</span>
+                    </button>
+                    <button class="card-option" id="card-opt-2">
+                        <span class="concept" id="opt-2-left">Esquerda 2</span>
+                        <span class="vs-badge small">VS</span>
+                        <span class="concept" id="opt-2-right">Direita 2</span>
+                    </button>
                 </div>
             </div>
-            
-            <div class="opponent-controls" id="opponent-controls">
-                <p class="control-label">O Alvo está para qual lado do ponteiro?</p>
-                <div class="btn-group">
-                    <button class="btn btn-small" id="btn-guess-left">
-                        <span class="arrow">←</span>
-                        <span class="text">Esquerda</span>
-                    </button>
-                    <button class="btn btn-small" id="btn-guess-right">
-                        <span class="arrow">→</span>
-                        <span class="text">Direita</span>
-                    </button>
-                </div>
-            </div>
-        </section>
-    </main>
-
+        </div>
     </div>
 
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=104"></script>
 </body>
+
 </html>
