@@ -38,7 +38,7 @@ body {
     align-items: center;
     overflow-x: hidden;
     overflow-y: auto;
-    padding: 40px 0;
+    padding: 10px 0 40px 0;
     margin: 0;
     box-sizing: border-box;
 }
@@ -91,7 +91,7 @@ body {
 .game-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px; /* Reduzido para 10px conforme pedido */
     width: 95%;
     max-width: 700px;
     z-index: 10;
@@ -99,7 +99,7 @@ body {
 }
 
 .game-container {
-    padding: 2vh 0; /* Removido padding lateral excessivo e padding vertical suave */
+    padding: 0 0 2vh 0; /* Padding superior zerado para aproximar dos placares */
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -143,7 +143,7 @@ h1 {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    padding: 0;
+    padding: 0 5px; /* Recuo de 5px das bordas */
     pointer-events: none;
     z-index: 100;
 }
@@ -155,8 +155,9 @@ h1 {
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: clamp(4px, 1vh, 8px) clamp(10px, 3vw, 40px);
-    min-width: clamp(100px, 25vw, 150px);
+    padding: clamp(12px, 2vh, 20px) clamp(10px, 3vw, 40px);
+    flex: 1;
+    max-width: 180px;
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(10px);
     border-radius: 10px;
@@ -241,7 +242,7 @@ h1 {
 
 /* Shared typography */
 .team-score .label {
-    font-size: clamp(0.5rem, 1.5vw, 0.7rem);
+    font-size: clamp(0.7rem, 2vw, 0.9rem);
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: 900;
@@ -249,7 +250,7 @@ h1 {
 }
 
 .team-score .value {
-    font-size: clamp(1rem, 4vw, 1.5rem);
+    font-size: clamp(1.5rem, 5vw, 2.2rem);
     font-weight: 900;
     line-height: 1;
 }
@@ -1128,6 +1129,8 @@ h1 {
     justify-content: center;
     transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .btn-power-trigger {
@@ -1221,14 +1224,15 @@ h1 {
 /* --- ALTERNATIVE CARD & MODAL --- */
 .btn-alt-card-mini {
     position: absolute;
-    top: -15px; /* fica no meio da borda superior, acima do VS */
+    top: clamp(-45px, -12vw, -35px);
     left: 50%;
     transform: translateX(-50%);
     background: #1e1e28;
     border: 1px solid var(--glass-border);
     color: var(--text-secondary);
-    width: 32px;
-    height: 32px;
+    width: clamp(32px, 8vw, 40px);
+    height: clamp(32px, 8vw, 40px);
+    font-size: clamp(1rem, 3vw, 1.3rem);
     border-radius: 50%;
     display: flex;
     justify-content: center;
