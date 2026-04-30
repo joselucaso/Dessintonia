@@ -6,11 +6,6 @@
 const DEBUG = false; // Mude para true para ver logs de debug
 
 const CONFIG = {
-    TARGET_ZONES: [
-        { id: 'zone-2', range: 20, points: 2, color: 'var(--target-2)' },
-        { id: 'zone-3', range: 12, points: 3, color: 'var(--target-3)' },
-        { id: 'zone-4', range: 4,  points: 4, color: 'var(--target-4)' }
-    ],
     OPPONENT_POINTS: 1,
     WIN_SCORE: 10,
     TARGET_MIN_DISTANCE: 30,  // graus mínimos entre alvos consecutivos
@@ -145,7 +140,7 @@ class DessintoniaGame {
             spin: new Audio('audio/Roleta.mp3'),
             super: new Audio('audio/Poder1.mp3'),
             break: new Audio('audio/VidroQuebrando.mp3'),
-            charge: new Audio('audio/CargaPoder.mp3')
+            charge: new Audio('audio/Carga.mp3')
         };
         
         // Game Feel elements
@@ -469,17 +464,11 @@ class DessintoniaGame {
         this.saveState();
     }
 
-    // Helper: retorna dados do time pelo id
-    getTeamData(id) {
-        return CONFIG.TEAMS.find(t => t.id === id);
-    }
-
     newRound() {
         log("--- INICIANDO NOVA RODADA ---");
         // Resetar flags de decisão para AMBOS os times
         this.hasUsedPowerThisRound = { 1: false, 2: false };
         this.hasGuessedThisRound = { 1: false, 2: false };
-        this.hasDrawnAlternativeCard = false;
         this.alternativeCard = null;
 
         // Alternar time sempre (se não revelou o alvo, perde a vez)
@@ -603,7 +592,6 @@ class DessintoniaGame {
         // Só sorteia se ainda não tiver sorteado a alternativa nesta rodada
         if (!this.alternativeCard) {
             this.alternativeCard = this.drawCard();
-            this.hasDrawnAlternativeCard = true;
         }
         
         this.dom.btnAltCard.style.display = 'none'; // Some o botão enquanto o modal está aberto
@@ -701,7 +689,10 @@ class DessintoniaGame {
         const score = this.calculateScore();
         
         // Add score to current team
-        this.teamScores[this.currentTeam] += score;
+        if (score > 0) {
+            this.teamScores[this.currentTeam] += score;
+            this.showSubtleFeedback(this.currentTeam, score);
+        }
         
         // Processar palpite do oponente (silenciosamente)
         if (this.opponentGuess && score < 4) {
@@ -716,6 +707,7 @@ class DessintoniaGame {
             
             if (won) {
                 this.teamScores[otherTeam] += CONFIG.OPPONENT_POINTS;
+                this.showSubtleFeedback(otherTeam, CONFIG.OPPONENT_POINTS, this.opponentGuess);
             }
         }
 
@@ -723,14 +715,17 @@ class DessintoniaGame {
         this.applyScoreVisuals(score);
 
         // Lógica da Barra de Especial:
-        // Quando o time ATUAL acerta o alvo (score > 0), ele carrega 1 carga de poder.
-        // O poder fica disponível para usar nas PRÓXIMAS rodadas.
+        // Incrementa o poder imediatamente (dados) para que o botão funcione
+        // na próxima rodada. A animação visual da barra será sincronizada
+        // com o som de carga em playChargeSequence (NÃO chama updatePowerUI aqui).
         if (score > 0) {
             if (this.teamPower[this.currentTeam] < 3) {
                 this.teamPower[this.currentTeam]++;
             }
+            // NÃO chama updatePowerUI() — playChargeSequence cuida do visual
+        } else {
+            this.updatePowerUI();
         }
-        this.updatePowerUI();
         this.updatePowerButtonVisibility();
 
         this.dom.opponentControls.style.opacity = '0.5';
@@ -857,9 +852,6 @@ class DessintoniaGame {
             this.dom.superText.style.setProperty('--team-color', teamColor);
         }
         this.dom.superAnnouncement.classList.add('active');
-        
-        this.sounds.charge.currentTime = 0;
-        this.sounds.charge.play().catch(e => console.log("Audio charge prevented"));
         
         document.body.classList.add('power-charging');
         document.body.style.setProperty('--team-power-color', teamColor);
@@ -1055,8 +1047,33 @@ class DessintoniaGame {
         return 0;
     }
 
-    generateFeedbackText(score) {
-        return score === 0 ? "FORA DO ALVO!" : "";
+    showSubtleFeedback(teamId, points, guessSide = null) {
+        // 1. Placar pulsa
+        const scoreEl = teamId === 1 ? this.dom.team1Score : this.dom.team2Score;
+        scoreEl.classList.remove('score-pulse');
+        void scoreEl.offsetWidth; // trigger reflow
+        scoreEl.classList.add('score-pulse');
+
+        // 2. Texto flutuante
+        const container = teamId === 1 ? this.dom.team1Container : this.dom.team2Container;
+        const color = teamId === 1 ? 'var(--color-violet)' : 'var(--color-cyan)';
+        
+        const floatEl = document.createElement('div');
+        floatEl.className = 'floating-points-subtle';
+        floatEl.textContent = `+${points}`;
+        floatEl.style.color = color;
+        container.appendChild(floatEl);
+        setTimeout(() => floatEl.remove(), 1200);
+
+        // 3. Piscar botão de palpite do oponente se for o caso
+        if (guessSide) {
+            const btn = guessSide === 'left' ? this.dom.btnGuessLeft : this.dom.btnGuessRight;
+            btn.style.setProperty('color', color, 'important');
+            btn.classList.remove('guess-flash');
+            void btn.offsetWidth;
+            btn.classList.add('guess-flash');
+            setTimeout(() => btn.style.removeProperty('color'), 600);
+        }
     }
 
     applyScoreVisuals(score) {
@@ -1073,10 +1090,66 @@ class DessintoniaGame {
             this.sounds.success.currentTime = 0;
             this.sounds.success.play().catch(() => {});
 
+            // Quando o som de acerto terminar → disparar sequência de carga
+            const onSuccessEnd = () => {
+                this.sounds.success.removeEventListener('ended', onSuccessEnd);
+                this.playChargeSequence();
+            };
+            this.sounds.success.addEventListener('ended', onSuccessEnd);
+
         } else {
             // Som de erro
             this.sounds.fail.currentTime = 0;
             this.sounds.fail.play().catch(() => {});
+        }
+    }
+
+    /**
+     * Toca o som de carga e sincroniza a subida da barra de energia.
+     * O segmento novo aparece com animação de "enchimento" que dura
+     * exatamente o tempo do áudio de carga.
+     */
+    playChargeSequence() {
+        const teamId = this.currentTeam;
+        // O poder já foi incrementado em reveal() — aqui só cuidamos
+        // do som de carga e da animação visual da barra.
+        const power = this.teamPower[teamId];
+
+        // Tocar o som de carga
+        this.sounds.charge.currentTime = 0;
+        this.sounds.charge.play().catch(() => {});
+
+        if (power <= 0) return;
+
+        // O segmento que acabou de ser preenchido (índice = power - 1, 0-based)
+        const bar = this.dom.powerBars[teamId];
+        const segments = Array.from(bar.querySelectorAll('.special-segment'));
+        const filledIndex = power - 1;
+        const seg = segments[filledIndex];
+
+        if (seg) {
+            // Temporariamente remove o estado "filled" para animá-lo
+            seg.classList.remove('filled');
+            seg.classList.add('charging');
+
+            // Quando o som de carga terminar, finaliza a animação
+            const onChargeEnd = () => {
+                this.sounds.charge.removeEventListener('ended', onChargeEnd);
+                seg.classList.remove('charging');
+                seg.classList.add('filled');
+                this.updatePowerUI();
+            };
+            this.sounds.charge.addEventListener('ended', onChargeEnd);
+
+            // Fallback caso o áudio trave
+            setTimeout(() => {
+                if (seg.classList.contains('charging')) {
+                    this.sounds.charge.removeEventListener('ended', onChargeEnd);
+                    seg.classList.remove('charging');
+                    seg.classList.add('filled');
+                    this.updatePowerUI();
+                }
+            }, 5000);
         }
     }
 
