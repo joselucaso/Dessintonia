@@ -464,49 +464,9 @@ h1 {
     cursor: grabbing;
 }
 
-.score-display {
-    margin-top: -20px;
-    font-size: 1.8rem;
-    font-weight: 900;
-    color: var(--text-secondary);
-    text-align: center;
-    transition: color 0.3s;
-}
-
-.graphical-score {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 5px;
-}
-
-.score-star {
-    font-size: 1.6rem;
-    margin: 0 1px;
-    display: inline-block;
-    opacity: 0;
-    animation: star-fade 0.2s ease-out forwards;
-}
-
-/* Cada estrela aparece com um pequeno delay em cascata */
-.score-star:nth-child(1) { animation-delay: 0ms;   }
-.score-star:nth-child(2) { animation-delay: 80ms;  }
-.score-star:nth-child(3) { animation-delay: 160ms; }
-.score-star:nth-child(4) { animation-delay: 240ms; }
-
-@keyframes star-fade {
-    to { opacity: 1; }
-}
-
-.score-text {
-    font-size: 1rem;
-    letter-spacing: 2px;
-    opacity: 0.7;
-}
-
 /* --- GAME FEEL / JUICE EFFECTS --- */
 
-/* 1. Neon Flashbang Overlay */
+/* Neon Flashbang Overlay */
 .flash-overlay {
     position: fixed;
     top: 0;
@@ -523,47 +483,6 @@ h1 {
 .flash-overlay.active {
     opacity: 0.85;
     transition: none;
-}
-
-/* 3. Score Mega Pop */
-.score-display.mega-highlight {
-    animation: mega-pop 1s cubic-bezier(0.175, 0.885, 0.32, 1.5) forwards;
-}
-
-.score-display.mega-highlight-epic {
-    animation: mega-pop-epic 1.5s cubic-bezier(0.175, 0.885, 0.32, 2) forwards;
-}
-
-@keyframes mega-pop {
-    0% { transform: scale(0.5); opacity: 0; }
-    50% { transform: scale(1.3); opacity: 1; text-shadow: 0 0 10px currentColor; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-@keyframes mega-pop-epic {
-    0% { transform: scale(0.5) rotate(-10deg); opacity: 0; }
-    50% { transform: scale(1.5) rotate(5deg); opacity: 1; text-shadow: 0 0 15px currentColor; }
-    100% { transform: scale(1.1) rotate(0); opacity: 1; }
-}
-
-.feedback-text {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin-top: 5px;
-    min-height: 20px;
-    transition: color 0.3s;
-}
-
-.feedback-text.miss {
-    color: #ff4444;
-    font-weight: 700;
-    animation: miss-pulse 0.4s ease-out;
-}
-
-@keyframes miss-pulse {
-    0%   { opacity: 0; transform: scale(0.9); }
-    60%  { opacity: 1; transform: scale(1.05); }
-    100% { transform: scale(1); }
 }
 
 /* --- Barra de progresso 0 → 10 --- */
@@ -944,48 +863,51 @@ h1 {
     transform: translate(-50%, -50%) scale(1);
 }
 
-/* Quando for tela de vitória, habilita cliques (botão de restart) */
 .super-announcement.win-screen {
     pointer-events: auto;
+    width: 100vw; /* Permite ocupar a tela toda para não quebrar linha */
+    max-width: none;
 }
 
 .super-text {
-    font-size: clamp(1rem, 3.5vw, 2rem);
+    font-size: clamp(1.5rem, 6vw, 3rem);
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 6px;
-    line-height: 1;
+    letter-spacing: 4px;
+    line-height: 1.1;
     color: #fff;
+    -webkit-text-stroke: 2.5px #000; /* Contorno mais grosso */
+    paint-order: stroke fill;
     text-shadow: 
-        0 0 10px currentColor,
-        0 0 20px currentColor,
-        0 0 40px currentColor;
+        3px 3px 0px #000,
+        0 0 15px var(--team-color, #fff),
+        0 0 30px var(--team-color, #fff);
     animation: text-pulse 0.5s infinite alternate;
 }
 
 /* Texto específico da tela de vitória — mais flexível */
 .win-text {
-    font-size: clamp(1rem, 3.5vw, 2rem);
+    font-size: clamp(1.4rem, 5.5vw, 3rem);
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: clamp(1px, 0.5vw, 4px); /* letter-spacing também responsivo */
+    letter-spacing: 2px;
     line-height: 1.2;
     color: #fff;
-    word-break: break-word;   /* quebra nomes longos se necessário */
-    overflow-wrap: break-word;
+    -webkit-text-stroke: 2.5px #000; /* Contorno mais grosso */
+    paint-order: stroke fill;
+    white-space: nowrap; /* Garante uma única linha */
     text-shadow: 
-        0 0 10px currentColor,
-        0 0 20px currentColor,
-        0 0 40px currentColor;
+        3px 3px 0px #000,
+        0 0 15px var(--team-color, #fff),
+        0 0 30px var(--team-color, #fff);
     animation: text-pulse 0.5s infinite alternate;
-    pointer-events: auto; /* permite clicar no botão filho */
+    pointer-events: auto;
     display: block;
-    width: 100%;
 }
 
 @keyframes text-pulse {
-    0% { transform: scale(1); filter: brightness(1); }
-    100% { transform: scale(1.05); filter: brightness(1.5); }
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
 }
 
 /* --- LIGHTNING STRIKE EFFECT --- */

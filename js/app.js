@@ -303,10 +303,6 @@ class DessintoniaGame {
             opponentGroup: document.getElementById('opponent-guess-group'),
             leftConcept: document.getElementById('left-concept'),
             rightConcept: document.getElementById('right-concept'),
-            scoreValue: document.querySelector('.score-value'),
-            scoreDisplay: document.getElementById('score-display'),
-            graphicalScore: document.getElementById('graphical-score'),
-            feedbackText: document.getElementById('feedback-text'),
             btnPeek: document.getElementById('btn-peek'),
             btnReveal: document.getElementById('btn-reveal'),
             btnRefresh: document.getElementById('btn-next'),
@@ -445,10 +441,8 @@ class DessintoniaGame {
         });
 
         this.dom.menuResetGame.addEventListener('click', () => {
-            if (confirm("Deseja reiniciar a partida inteira? (Zerar placares e especial)")) {
-                this.resetFullGame();
-                this.dom.settingsModal.style.display = 'none';
-            }
+            this.resetFullGame();
+            this.dom.settingsModal.style.display = 'none';
         });
 
         // Fechar menus ao clicar fora (opcional, já que é modal)
@@ -456,7 +450,10 @@ class DessintoniaGame {
             if (e.target === this.dom.settingsModal) {
                 this.dom.settingsModal.style.display = 'none';
             }
-            if (this.dom.menuPowerCentral) this.dom.menuPowerCentral.classList.remove('active');
+            // Só fecha o menu de poder se o clique foi FORA do wrapper do poder
+            if (this.dom.menuPowerCentral && this.dom.powerCentralWrapper && !this.dom.powerCentralWrapper.contains(e.target)) {
+                this.dom.menuPowerCentral.classList.remove('active');
+            }
         });
     }
 
@@ -495,13 +492,6 @@ class DessintoniaGame {
         this.dom.targetGroup.innerHTML = '';
         this.dom.targetGroup.style.opacity = '1'; // Mantém visível por trás da tela
         this.dom.screenPath.style.opacity = '1';
-        this.dom.scoreValue.textContent = '0';
-        this.dom.scoreDisplay.style.color = 'var(--text-secondary)';
-        this.dom.scoreDisplay.style.textShadow = 'none';
-        this.dom.feedbackText.textContent = '';
-        this.dom.feedbackText.classList.remove('miss');
-        this.dom.scoreDisplay.style.display = 'none'; // Esconde "0 PONTOS"
-        this.dom.graphicalScore.innerHTML = '';
         this.dom.opponentGroup.style.display = 'none';
         this.dom.btnGuessLeft.classList.remove('active');
         this.dom.btnGuessRight.classList.remove('active');
@@ -696,21 +686,25 @@ class DessintoniaGame {
     }
 
     reveal() {
+        // Guarda contra re-execução: impede pontuar mais de uma vez por rodada
+        if (this.state === 'revealed' || this.state === 'gameover') return;
+        
         this.state = 'revealed';
         this.dom.screenPath.style.opacity = '0';
         this.dom.targetGroup.style.opacity = '1';
         this.dom.btnAltCard.style.display = 'none'; // Garantir que some ao revelar
         
+        // Desabilitar botões imediatamente para impedir cliques repetidos
+        this.dom.btnReveal.disabled = true;
+        this.dom.btnPeek.disabled = true;
+        
         const score = this.calculateScore();
         
         // Add score to current team
         this.teamScores[this.currentTeam] += score;
-        this.dom.scoreValue.textContent = score;
         
-        let feedback = this.generateFeedbackText(score);
-        
-        // Check opponent guess
-        if (this.opponentGuess) {
+        // Processar palpite do oponente (silenciosamente)
+        if (this.opponentGuess && score < 4) {
             const otherTeam = this.currentTeam === 1 ? 2 : 1;
             let diff = this.targetAngle - this.markerAngle;
             if (diff > 90) diff -= 180;
@@ -720,35 +714,12 @@ class DessintoniaGame {
             const isActuallyRight = diff > 0;
             const won = (this.opponentGuess === 'left' && isActuallyLeft) || (this.opponentGuess === 'right' && isActuallyRight);
             
-            if (won && score < 4) {
+            if (won) {
                 this.teamScores[otherTeam] += CONFIG.OPPONENT_POINTS;
-                feedback += ` (+${CONFIG.OPPONENT_POINTS} ponto para o time adversário!)`;
-            } else if (!won && score < 4) {
-                feedback += " (Adversários erraram o palpite.)";
             }
         }
 
         this.updateScoreUI();
-        this.dom.feedbackText.textContent = feedback;
-        this.dom.feedbackText.classList.toggle('miss', score === 0);
-
-        // Estrelas de pontuação (simples, leve)
-        const colors = { 4: 'var(--target-4)', 3: 'var(--target-3)', 2: 'var(--target-2)' };
-        this.dom.graphicalScore.innerHTML = '';
-        if (score > 0) {
-            this.dom.scoreDisplay.style.display = 'block';
-            this.dom.scoreDisplay.style.color = colors[score];
-            for (let i = 0; i < score; i++) {
-                const star = document.createElement('span');
-                star.className = 'score-star';
-                star.textContent = '★';
-                star.style.color = colors[score];
-                this.dom.graphicalScore.appendChild(star);
-            }
-        } else {
-            this.dom.scoreDisplay.style.display = 'none';
-        }
-
         this.applyScoreVisuals(score);
 
         // Lógica da Barra de Especial:
@@ -780,8 +751,10 @@ class DessintoniaGame {
     }
 
     checkWin() {
-        if (this.state === 'gameover') return; // guard contra reentrada
-        const winner = [1, 2].find(id => this.teamScores[id] >= CONFIG.WIN_SCORE);
+        if (this.state === 'gameover') return;
+        const winner = this.teamScores[1] >= CONFIG.WIN_SCORE ? 1 : 
+                       this.teamScores[2] >= CONFIG.WIN_SCORE ? 2 : null;
+        
         if (!winner) return;
 
         // Trava o jogo
@@ -800,8 +773,8 @@ class DessintoniaGame {
         // Mostra anúncio de vitória com classe responsiva
         if (this.dom.superText) {
             this.dom.superText.className = 'win-text'; // troca para classe responsiva
-            this.dom.superText.textContent = `🏆 ${teamName} VENCEU! 🏆`;
-            this.dom.superText.style.color = teamColor;
+            this.dom.superText.textContent = `${teamName} VENCEU!`;
+            this.dom.superText.style.setProperty('--team-color', teamColor);
         }
         this.dom.superAnnouncement.classList.add('active', 'win-screen');
 
@@ -816,22 +789,26 @@ class DessintoniaGame {
             restartBtn.id = 'btn-restart';
             restartBtn.textContent = 'JOGAR NOVAMENTE';
             restartBtn.style.cssText = [
-                'margin:20px auto 0', 'padding:12px 30px', 'font-size:1rem',
-                'font-weight:900', 'border-radius:12px', 'border:none',
-                'cursor:pointer', 'letter-spacing:1px', 'display:block',
+                'margin:30px auto 0', 'padding:15px 40px', 'font-size:1.1rem',
+                'font-weight:900', 'border-radius:50px', 'border:none',
+                'cursor:pointer', 'letter-spacing:2px', 'display:block',
                 'pointer-events:auto', 'position:relative', 'z-index:10001',
-                `background:${teamColor}`, 'color:#000',
-                "font-family:'Outfit',sans-serif"
+                `background:#fff`, `color:#000`, // Fundo branco para contrastar com o neon
+                "font-family:'Outfit',sans-serif",
+                '-webkit-text-stroke: 0', // Remove contorno herdado
+                `box-shadow: 0 0 20px ${teamColor}, 0 0 40px ${teamColor}`
             ].join(';');
+            
             restartBtn.addEventListener('click', () => {
                 this.dom.superAnnouncement.classList.remove('active', 'win-screen');
                 this.dom.superText.className = 'super-text'; // restaura classe original
                 this.dom.superText.innerHTML = '';
                 this.dom.superText.style.color = '';
+                restartBtn.remove(); // Remove o botão ao reiniciar
                 this.resetFullGame();
             });
-            this.dom.superText.appendChild(document.createElement('br'));
-            this.dom.superText.appendChild(restartBtn);
+            
+            this.dom.superAnnouncement.appendChild(restartBtn);
         }, CONFIG.TIMINGS.winRestartDelay);
     }
 
@@ -877,7 +854,7 @@ class DessintoniaGame {
         // --- FASE 1: Mensagem aparece (0 → 1200ms) ---
         if (this.dom.superText) {
             this.dom.superText.innerHTML = `ATAQUE NÍVEL ${level}! ⚡`;
-            this.dom.superText.style.color = teamColor;
+            this.dom.superText.style.setProperty('--team-color', teamColor);
         }
         this.dom.superAnnouncement.classList.add('active');
         
@@ -1128,6 +1105,7 @@ class DessintoniaGame {
         const offset = this.opponentGuess === 'left' ? -25 : 25;
         this.dom.opponentGroup.setAttribute('transform', `rotate(${this.markerAngle + offset - 90}, 200, 180)`);
     }
+
 
     getAngleFromEvent(e) {
         const pt = this.dom.svg.createSVGPoint();
