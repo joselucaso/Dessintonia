@@ -130,7 +130,7 @@ h1 {
     align-items: center;
     justify-content: center;
     padding: clamp(4px, 1vh, 8px) clamp(10px, 3vw, 40px);
-    min-width: clamp(100px, 25vw, 150px);
+    width: clamp(130px, 32vw, 180px);
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(10px);
     border-radius: 10px;
@@ -139,6 +139,83 @@ h1 {
     transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
     opacity: 0.65;
     filter: grayscale(0.4);
+}
+
+    opacity: 0.65;
+    filter: grayscale(0.4);
+}
+
+.settings-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.btn-settings {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+}
+
+.btn-settings:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    transform: rotate(90deg);
+}
+
+.btn-settings:active {
+    transform: scale(0.9);
+}
+
+.settings-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px 0;
+}
+
+.menu-btn-large {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: white;
+    padding: 20px;
+    border-radius: 15px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.menu-btn-large:hover {
+    background: rgba(255, 61, 61, 0.15);
+    border-color: rgba(255, 61, 61, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.menu-btn-large:active {
+    transform: translateY(-1px);
+}
+
+.menu-btn-large svg {
+    color: #ff3b3b;
 }
 
 .team-score.purple {
@@ -248,14 +325,16 @@ h1 {
 }
 
 .concept {
-    font-size: clamp(0.9rem, 4vw, 1.5rem);
+    font-size: clamp(0.75rem, 3.8vw, 1.3rem);
     font-weight: 700;
     text-transform: uppercase;
     flex: 1;
     text-align: center;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
     transition: all 0.3s ease;
-    word-break: break-word;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     line-height: 1.1;
 }
 

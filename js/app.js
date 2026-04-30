@@ -136,7 +136,7 @@ class DessintoniaGame {
         this.state = 'guessing'; // 'guessing' | 'revealed' | 'gameover'
         this.teamScores = { 1: 0, 2: 0 };
         this.teamPower = { 1: 0, 2: 0 };
-        this.currentTeam = 1;
+        this.currentTeam = 2; // Começa em 2 para que o newRound() coloque no 1 (Violeta) na primeira rodada
         this.isPeeking = false;
         this.lastCardId = null; // para evitar repetição de carta
         this.sounds = {
@@ -341,7 +341,11 @@ class DessintoniaGame {
             opt1Right: document.getElementById('opt-1-right'),
             opt2Left: document.getElementById('opt-2-left'),
             opt2Right: document.getElementById('opt-2-right'),
-            btnCloseCardModal: document.getElementById('btn-close-card-modal')
+            btnCloseCardModal: document.getElementById('btn-close-card-modal'),
+            btnSettings: document.getElementById('btn-settings'),
+            settingsModal: document.getElementById('settings-modal'),
+            btnCloseSettingsModal: document.getElementById('btn-close-settings-modal'),
+            menuResetGame: document.getElementById('menu-reset-game')
         };
     }
 
@@ -361,14 +365,18 @@ class DessintoniaGame {
             this.updateMarker(angle);
         };
 
-        window.addEventListener('touchend', () => {
+        this.dom.svg.addEventListener('mousedown', startAction);
+        window.addEventListener('mousemove', updateFromEvent);
+        window.addEventListener('mouseup', () => {
             if (isDragging) {
                 isDragging = false;
                 this.saveState();
             }
         });
 
-        window.addEventListener('mouseup', () => {
+        this.dom.svg.addEventListener('touchstart', startAction, { passive: false });
+        window.addEventListener('touchmove', updateFromEvent, { passive: false });
+        window.addEventListener('touchend', () => {
             if (isDragging) {
                 isDragging = false;
                 this.saveState();
@@ -427,6 +435,41 @@ class DessintoniaGame {
             this.dom.cardChoiceModal.style.display = 'none';
             this.dom.btnAltCard.style.display = 'block'; // Mostra o botão de volta se cancelou
         });
+
+        this.dom.btnSettings.addEventListener('click', () => {
+            this.dom.settingsModal.style.display = 'flex';
+        });
+
+        this.dom.btnCloseSettingsModal.addEventListener('click', () => {
+            this.dom.settingsModal.style.display = 'none';
+        });
+
+        this.dom.menuResetGame.addEventListener('click', () => {
+            if (confirm("Deseja reiniciar a partida inteira? (Zerar placares e especial)")) {
+                this.resetFullGame();
+                this.dom.settingsModal.style.display = 'none';
+            }
+        });
+
+        // Fechar menus ao clicar fora (opcional, já que é modal)
+        window.addEventListener('click', (e) => {
+            if (e.target === this.dom.settingsModal) {
+                this.dom.settingsModal.style.display = 'none';
+            }
+            if (this.dom.menuPowerCentral) this.dom.menuPowerCentral.classList.remove('active');
+        });
+    }
+
+    resetFullGame() {
+        this.teamScores = { 1: 0, 2: 0 };
+        this.teamPower = { 1: 0, 2: 0 };
+        this.currentTeam = 2; // Para que o newRound() coloque no 1 (Violeta)
+        this.shuffleDeck();
+        this.dom.btnRefresh.disabled = false;
+        this.state = 'revealed'; // Truque para o newRound resetar tudo visualmente
+        this.updateScoreUI();
+        this.newRound();
+        this.saveState();
     }
 
     // Helper: retorna dados do time pelo id
@@ -785,14 +828,7 @@ class DessintoniaGame {
                 this.dom.superText.className = 'super-text'; // restaura classe original
                 this.dom.superText.innerHTML = '';
                 this.dom.superText.style.color = '';
-                this.teamScores = { 1: 0, 2: 0 };
-                this.teamPower  = { 1: 0, 2: 0 };
-                this.shuffleDeck(); // novo baralho ao reiniciar
-                this.currentTeam = 1;
-                this.dom.btnRefresh.disabled = false;
-                this.state = 'revealed';
-                this.updateScoreUI();
-                this.newRound();
+                this.resetFullGame();
             });
             this.dom.superText.appendChild(document.createElement('br'));
             this.dom.superText.appendChild(restartBtn);
