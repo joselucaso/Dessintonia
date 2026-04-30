@@ -162,7 +162,77 @@ class DessintoniaGame {
         this.setupDOMReferences();
         this.setupEventListeners();
         this.drawScale();
-        this.newRound();
+        
+        if (!this.loadState()) {
+            this.newRound();
+        }
+    }
+
+    saveState() {
+        const state = {
+            teamScores: this.teamScores,
+            teamPower: this.teamPower,
+            currentTeam: this.currentTeam,
+            currentCard: this.currentCard,
+            targetAngle: this.targetAngle,
+            markerAngle: this.markerAngle,
+            opponentGuess: this.opponentGuess,
+            gameState: this.state, // avoid collision with 'state' keyword
+            lastCardId: this.lastCardId
+        };
+        localStorage.setItem('dessintonia_state', JSON.stringify(state));
+    }
+
+    loadState() {
+        const saved = localStorage.getItem('dessintonia_state');
+        if (!saved) return false;
+        try {
+            const data = JSON.parse(saved);
+            this.teamScores = data.teamScores || { 1: 0, 2: 0 };
+            this.teamPower = data.teamPower || { 1: 0, 2: 0 };
+            this.currentTeam = data.currentTeam || 1;
+            this.currentCard = data.currentCard;
+            this.targetAngle = data.targetAngle || 90;
+            this.markerAngle = data.markerAngle || 90;
+            this.opponentGuess = data.opponentGuess;
+            this.state = data.gameState || 'guessing';
+            this.lastCardId = data.lastCardId;
+
+            // Restore UI
+            this.updateTeamUI();
+            this.updateScoreUI();
+            this.updatePowerUI();
+            this.updatePowerButtonVisibility();
+            this.drawTarget(this.targetAngle);
+            this.updateMarker(this.markerAngle);
+            
+            if (this.currentCard) {
+                this.dom.leftConcept.textContent = this.currentCard.left;
+                this.dom.rightConcept.textContent = this.currentCard.right;
+            }
+
+            if (this.state === 'revealed') {
+                this.dom.screenPath.style.opacity = '0';
+                this.dom.targetGroup.style.opacity = '1';
+                this.dom.btnReveal.disabled = true;
+                this.dom.btnPeek.disabled = true;
+                this.dom.opponentControls.style.opacity = '0.5';
+                this.dom.opponentControls.style.pointerEvents = 'none';
+            }
+
+            if (this.opponentGuess) {
+                this.dom.opponentGroup.style.display = 'block';
+                this.dom.btnGuessLeft.classList.toggle('active', this.opponentGuess === 'left');
+                this.dom.btnGuessRight.classList.toggle('active', this.opponentGuess === 'right');
+                this.updateOpponentArrow();
+            }
+
+            return true;
+        } catch (e) {
+            console.error("[STORAGE] Erro ao carregar estado:", e);
+            localStorage.removeItem('dessintonia_state');
+            return false;
+        }
     }
 
     async loadCards() {
@@ -291,15 +361,19 @@ class DessintoniaGame {
             this.updateMarker(angle);
         };
 
-        const stopAction = () => isDragging = false;
+        window.addEventListener('touchend', () => {
+            if (isDragging) {
+                isDragging = false;
+                this.saveState();
+            }
+        });
 
-        this.dom.svg.addEventListener('mousedown', startAction);
-        window.addEventListener('mousemove', updateFromEvent);
-        window.addEventListener('mouseup', stopAction);
-
-        this.dom.svg.addEventListener('touchstart', startAction, { passive: false });
-        window.addEventListener('touchmove', updateFromEvent, { passive: false });
-        window.addEventListener('touchend', stopAction);
+        window.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                this.saveState();
+            }
+        });
 
         // Peek (Hold logic)
         const startPeek = () => { 
@@ -432,6 +506,7 @@ class DessintoniaGame {
             pivot.style.fill = '#ff3b3b';
             pivot.style.filter = 'drop-shadow(0 0 10px rgba(255, 59, 59, 0.5))';
         }
+        this.saveState();
     }
 
     runSpinAnimation(finalAngle) {
@@ -644,10 +719,9 @@ class DessintoniaGame {
         this.updatePowerUI();
         this.updatePowerButtonVisibility();
 
-        this.dom.btnPeek.disabled = true;
-        this.dom.btnReveal.disabled = true;
         this.dom.opponentControls.style.opacity = '0.5';
         this.dom.opponentControls.style.pointerEvents = 'none';
+        this.saveState();
     }
 
     updateScoreUI() {
@@ -1005,6 +1079,7 @@ class DessintoniaGame {
         this.dom.btnGuessLeft.classList.toggle('active', side === 'left');
         this.dom.btnGuessRight.classList.toggle('active', side === 'right');
         this.updateOpponentArrow();
+        this.saveState();
     }
 
     updateMarker(angle) {

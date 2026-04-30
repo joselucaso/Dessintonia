@@ -700,6 +700,17 @@ h1 {
     .controls {
         flex-direction: column;
         width: 100%;
+        gap: 15px;
+    }
+
+    .primary-btns {
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .primary-btns .btn {
+        flex: 1;
+        min-width: 120px;
     }
 
     /* Proteção extra para telas muito estreitas (evita sobreposição dos placares) */
@@ -803,8 +814,20 @@ h1 {
     }
 
     .opponent-controls {
-        display: none;
-        /* Hide for space, or could be moved */
+        padding: 10px;
+        gap: 5px;
+    }
+
+    .control-label {
+        font-size: 0.75rem;
+    }
+
+    .btn-group {
+        gap: 10px;
+    }
+
+    .btn-small {
+        max-width: 80px;
     }
 
     .score-display {
