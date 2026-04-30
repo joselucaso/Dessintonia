@@ -136,8 +136,9 @@ class DessintoniaGame {
         this.state = 'guessing'; // 'guessing' | 'revealed' | 'gameover'
         this.teamScores = { 1: 0, 2: 0 };
         this.teamPower = { 1: 0, 2: 0 };
+        this.currentTeam = 1;
         this.isPeeking = false;
-        this.lastCardId = null;
+        this.lastCardId = null; // para evitar repetição de carta
         this.sounds = {
             fail: new Audio('audio/faaah.mp3'),
             success: new Audio('audio/levelup.mp3'),
@@ -147,12 +148,13 @@ class DessintoniaGame {
             charge: new Audio('audio/CargaPoder.mp3')
         };
         
+        // Game Feel elements
+        this.init();
         this.isSpecialInProgress = false;
+        
+        // Estado inicial das flags de decisão
         this.hasUsedPowerThisRound = { 1: false, 2: false };
         this.hasGuessedThisRound = { 1: false, 2: false };
-        this.currentTeam = 2; // Para o newRound() inverter para 1 na primeira rodada
-
-        this.init();
     }
 
     async init() {
@@ -638,9 +640,9 @@ class DessintoniaGame {
             if (this.teamPower[this.currentTeam] < 3) {
                 this.teamPower[this.currentTeam]++;
             }
-            this.updatePowerUI();
-            this.updatePowerButtonVisibility();
         }
+        this.updatePowerUI();
+        this.updatePowerButtonVisibility();
 
         this.dom.btnPeek.disabled = true;
         this.dom.btnReveal.disabled = true;
@@ -896,6 +898,7 @@ class DessintoniaGame {
     runStageReturn(targetTeamId, attackerId, level) {
         const container = targetTeamId === 1 ? this.dom.team1Container : this.dom.team2Container;
         const bar = this.dom.powerBars[attackerId];
+
         container.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
         container.style.transform = 'translate(0, 0) scale(1)';
         

@@ -36,10 +36,18 @@
             </div>
         </div>
 
-        <main class="game-container">
-
+        <div class="card-area">
             <section class="card-section">
-                <!-- Barras de Especial Estilo Fighting Game -->
+                <div class="concept left-concept" id="left-concept">...</div>
+                <div class="vs-badge">VS</div>
+                <div class="concept right-concept" id="right-concept">...</div>
+                <button class="btn-alt-card-mini" id="btn-alt-card" style="display: none;" title="Sortear Carta Alternativa">
+                    🎴
+                </button>
+            </section>
+
+            <!-- Barras de Especial Estilo Fighting Game (Agora abaixo) -->
+            <div class="power-bars-row">
                 <div class="power-container left" id="power-zone-1">
                     <div class="special-bar left" id="special-bar-1">
                         <div class="special-segment" data-index="0"></div>
@@ -55,117 +63,108 @@
                         <div class="special-segment" data-index="2"></div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <div class="concept left-concept" id="left-concept">...</div>
-                <div class="vs-badge">VS</div>
-                <div class="concept right-concept" id="right-concept">...</div>
-                <button class="btn-alt-card-mini" id="btn-alt-card" style="display: none;" title="Sortear Carta Alternativa">
-                    🎴
-                </button>
-            </section>
+        <section class="dial-section">
+            <button class="btn-refresh" id="btn-next" title="Rodar Roleta">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="3" fill="none"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+            </button>
+            <div class="dial-wrapper">
+                <svg viewBox="0 0 400 220" class="dial-svg" id="dial-svg">
+                    <defs>
+                        <!-- Glow filter for the marker -->
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                        <!-- Gradient for the screen -->
+                        <linearGradient id="screen-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#1e1e28" />
+                            <stop offset="50%" stop-color="#2a2a35" />
+                            <stop offset="100%" stop-color="#1e1e28" />
+                        </linearGradient>
+                    </defs>
 
-            <section class="dial-section">
-                <button class="btn-refresh" id="btn-next" title="Rodar Roleta">
-                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="3" fill="none"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="23 4 23 10 17 10"></polyline>
-                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-                    </svg>
-                </button>
-                <div class="dial-wrapper">
-                    <svg viewBox="0 0 400 220" class="dial-svg" id="dial-svg">
-                        <defs>
-                            <!-- Glow filter for the marker -->
-                            <filter id="glow">
-                                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-                                <feMerge>
-                                    <feMergeNode in="coloredBlur" />
-                                    <feMergeNode in="SourceGraphic" />
-                                </feMerge>
-                            </filter>
-                            <!-- Gradient for the screen -->
-                            <linearGradient id="screen-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stop-color="#1e1e28" />
-                                <stop offset="50%" stop-color="#2a2a35" />
-                                <stop offset="100%" stop-color="#1e1e28" />
-                            </linearGradient>
-                        </defs>
-
-                        <!-- Background Arc (The full spectrum) -->
-                        <path class="dial-bg" d="M 60 180 A 140 140 0 0 1 340 180" fill="none" stroke-width="40"
-                            stroke-linecap="butt" />
+                    <!-- Background Arc (The full spectrum) -->
+                    <path class="dial-bg" d="M 60 180 A 140 140 0 0 1 340 180" fill="none" stroke-width="40"
+                        stroke-linecap="butt" />
 
 
 
-                        <!-- Target Area Slices (Generated by JS) -->
-                        <g id="target-group"></g>
+                    <!-- Target Area Slices (Generated by JS) -->
+                    <g id="target-group"></g>
 
-                        <!-- Ruler Scale Markings -->
-                        <g id="scale-group"></g>
+                    <!-- Ruler Scale Markings -->
+                    <g id="scale-group"></g>
 
-                        <!-- The Screen (Anteparo) -->
-                        <path id="screen-path" class="screen-door" d="M 60 180 A 140 140 0 0 1 340 180" fill="none"
-                            stroke="url(#screen-grad)" stroke-width="44" stroke-linecap="butt" />
+                    <!-- The Screen (Anteparo) -->
+                    <path id="screen-path" class="screen-door" d="M 60 180 A 140 140 0 0 1 340 180" fill="none"
+                        stroke="url(#screen-grad)" stroke-width="44" stroke-linecap="butt" />
 
-                        <!-- Marker Needle (The main Guess) -->
-                        <g id="marker-group" class="draggable">
-                            <!-- Red main pointer -->
-                            <line class="marker-line-main" x1="200" y1="180" x2="200" y2="30" stroke-linecap="round" />
-                            <circle class="marker-pivot" cx="200" cy="180" r="12" />
-                            <circle cx="200" cy="30" r="15" fill="transparent" class="marker-handle" />
-                        </g>
+                    <!-- Marker Needle (The main Guess) -->
+                    <g id="marker-group" class="draggable">
+                        <!-- Red main pointer -->
+                        <line class="marker-line-main" x1="200" y1="180" x2="200" y2="30" stroke-linecap="round" />
+                        <circle class="marker-pivot" cx="200" cy="180" r="12" />
+                        <circle cx="200" cy="30" r="15" fill="transparent" class="marker-handle" />
+                    </g>
 
-                        <!-- Opponent Guess Pointer (Left/Right) -->
-                        <g id="opponent-guess-group" style="display: none;">
-                            <path id="opponent-arrow" d="M 200 60 L 185 80 L 215 80 Z" fill="#ffffff" filter="url(#glow)" />
-                        </g>
+                    <!-- Opponent Guess Pointer (Left/Right) -->
+                    <g id="opponent-guess-group" style="display: none;">
+                        <path id="opponent-arrow" d="M 200 60 L 185 80 L 215 80 Z" fill="#ffffff" filter="url(#glow)" />
+                    </g>
 
-                        <!-- Center Arrow Marker (Above everything) -->
-                        <path d="M 194 15 L 206 15 L 200 25 Z" fill="#ff3b3b" style="pointer-events: none;" />
-                    </svg>
-                </div>
+                    <!-- Center Arrow Marker (Above everything) -->
+                    <path d="M 194 15 L 206 15 L 200 25 Z" fill="#ff3b3b" style="pointer-events: none;" />
+                </svg>
+            </div>
 
-                <div class="score-display" id="score-display" style="display: none;">
-                    <div id="graphical-score" class="graphical-score"></div>
-                    <div class="score-text"><span class="score-value">0</span> PONTOS</div>
-                </div>
-                <p class="feedback-text" id="feedback-text"></p>
-            </section>
+            <div class="score-display" id="score-display" style="display: none;">
+                <div id="graphical-score" class="graphical-score"></div>
+                <div class="score-text"><span class="score-value">0</span> PONTOS</div>
+            </div>
+            <p class="feedback-text" id="feedback-text"></p>
+        </section>
 
-            <section class="controls">
-                <div class="main-controls">
-                    <div class="primary-btns">
-                        <button class="btn btn-secondary" id="btn-peek">Espiar</button>
-                        
-                        <!-- BOTÃO POWER CENTRALIZADO -->
-                        <div class="power-trigger-wrapper visible" id="power-central-wrapper">
-                            <button class="btn-power-trigger" id="btn-power-trigger">⚡</button>
-                            <div class="power-levels-menu" id="menu-power-central">
-                                <button class="opt-power" data-level="1">⚡</button>
-                                <button class="opt-power" data-level="2">⚡⚡</button>
-                                <button class="opt-power" data-level="3">⚡⚡⚡</button>
-                            </div>
+        <section class="controls">
+            <div class="main-controls">
+                <div class="primary-btns">
+                    <button class="btn btn-secondary" id="btn-peek">Espiar</button>
+                    
+                    <!-- BOTÃO POWER CENTRALIZADO -->
+                    <div class="power-trigger-wrapper visible" id="power-central-wrapper">
+                        <button class="btn-power-trigger" id="btn-power-trigger">⚡</button>
+                        <div class="power-levels-menu" id="menu-power-central">
+                            <button class="opt-power" data-level="1">⚡</button>
+                            <button class="opt-power" data-level="2">⚡⚡</button>
+                            <button class="opt-power" data-level="3">⚡⚡⚡</button>
                         </div>
-
-                        <button class="btn btn-primary" id="btn-reveal">Revelar</button>
                     </div>
-                </div>
 
-                <div class="opponent-controls" id="opponent-controls">
-                    <p class="control-label">O Alvo está para qual lado do ponteiro?</p>
-                    <div class="btn-group">
-                        <button class="btn btn-small" id="btn-guess-left">
-                            <span class="arrow">←</span>
-                        </button>
-                        <button class="btn btn-small" id="btn-guess-right">
-                            <span class="arrow">→</span>
-                        </button>
-                    </div>
+                    <button class="btn btn-primary" id="btn-reveal">Revelar</button>
                 </div>
+            </div>
 
+            <div class="opponent-controls" id="opponent-controls">
+                <p class="control-label">O Alvo está para qual lado do ponteiro?</p>
+                <div class="btn-group">
+                    <button class="btn btn-small" id="btn-guess-left">
+                        <span class="arrow">←</span>
+                    </button>
+                    <button class="btn btn-small" id="btn-guess-right">
+                        <span class="arrow">→</span>
+                    </button>
                 </div>
-            </section>
-        </main>
+            </div>
+        </section>
 
         <div class="flash-overlay" id="flash-overlay"></div>
         <div id="super-announcement" class="super-announcement">
